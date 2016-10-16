@@ -9,7 +9,7 @@
 #import "DetailViewController.h"
 
 @interface DetailViewController ()
-
+@property (nonatomic) UIButton *button;
 @end
 
 @implementation DetailViewController
@@ -26,14 +26,25 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     [self configureView];
+    
+    UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay target:self action:@selector(notify)];
+    self.navigationItem.rightBarButtonItem = addButton;
+
+    self.button = [[UIButton alloc] init];
+    [self.button addTarget:self action:@selector(buttonTouched) forControlEvents:UIControlEventTouchUpInside];
 }
 
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+- (void)notify
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"poop" object:nil userInfo:@{@"hi there": @"oh yeah"}];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
+- (void)buttonTouched
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"poop" object:nil userInfo:@{@"hi there": @"oh yeah"}];
+    [self.navigationController popViewControllerAnimated:YES];
+}
 
 #pragma mark - Managing the detail item
 

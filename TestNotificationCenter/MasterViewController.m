@@ -9,6 +9,48 @@
 #import "MasterViewController.h"
 #import "DetailViewController.h"
 
+@interface SpecialCell : UITableViewCell
+
+@end
+
+@implementation SpecialCell
+
+- (instancetype)init
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(poop) name:@"poop" object:nil];
+    
+    return self;
+}
+
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
+{
+    if (!(self = [super initWithStyle:style reuseIdentifier:reuseIdentifier])) {
+        return nil;
+    }
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(poop) name:@"poop" object:nil];
+    
+    return self;
+}
+
+- (void)poop
+{
+    if (YES) {
+        //
+    }
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"poop" object:nil];
+}
+
+@end
+
 @interface MasterViewController ()
 
 @property NSMutableArray *objects;
@@ -18,6 +60,14 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    
+    [self.tableView registerClass:[SpecialCell class] forCellReuseIdentifier:@"Special"];
+    
+    for (int i = 0; i < 10000; i++) {
+        [self insertNewObject:nil];
+    }
+    
     // Do any additional setup after loading the view, typically from a nib.
     self.navigationItem.leftBarButtonItem = self.editButtonItem;
 
@@ -26,18 +76,10 @@
     self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
 }
 
-
 - (void)viewWillAppear:(BOOL)animated {
     self.clearsSelectionOnViewWillAppear = self.splitViewController.isCollapsed;
     [super viewWillAppear:animated];
 }
-
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
 
 - (void)insertNewObject:(id)sender {
     if (!self.objects) {
@@ -47,7 +89,6 @@
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
     [self.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
-
 
 #pragma mark - Segues
 
@@ -62,6 +103,19 @@
     }
 }
 
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSDate *object = self.objects[indexPath.row];
+
+    UIStoryboard *sb = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
+    DetailViewController *controller = [sb instantiateViewControllerWithIdentifier:@"Detail"];
+    [controller setDetailItem:object];
+    controller.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
+    controller.navigationItem.leftItemsSupplementBackButton = YES;
+    
+    [self.navigationController pushViewController:controller animated:YES];
+}
+
 
 #pragma mark - Table View
 
@@ -74,15 +128,14 @@
     return self.objects.count;
 }
 
-
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
-
+    //SpecialCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Special" forIndexPath:indexPath];
+    SpecialCell *cell = [[SpecialCell alloc] init];
     NSDate *object = self.objects[indexPath.row];
     cell.textLabel.text = [object description];
+
     return cell;
 }
-
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
     // Return NO if you do not want the specified item to be editable.
@@ -101,3 +154,4 @@
 
 
 @end
+
